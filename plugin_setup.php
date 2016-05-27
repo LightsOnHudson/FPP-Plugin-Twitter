@@ -4,18 +4,30 @@
 
 include_once "/opt/fpp/www/common.php";
 include_once "functions.inc.php";
+include_once "commonFunctions.inc.php";
 
 
 $pluginName = "Twitter";
 
 
 $logFile = $settings['logDirectory']."/".$pluginName.".log";
+$pluginUpdateFile = $settings['pluginDirectory']."/".$pluginName."/"."pluginUpdate.inc";
+
+$gitURL = "https://github.com/LightsOnHudson/FPP-Plugin-Twitter.git";
+
+logEntry("plugin update file: ".$pluginUpdateFile);
+
+if(isset($_POST['updatePlugin']))
+{
+	logEntry("updating plugin...");
+	$updateResult = updatePluginFromGitHub($gitURL, $branch="master", $pluginName);
+
+	echo $updateResult."<br/> \n";
+}
 
 
 if(isset($_POST['submit']))
 {
-	$SPORTS =  implode(',', $_POST["SPORTS"]);
-
 //	echo "Writring config fie <br/> \n";
 	
 	
@@ -33,7 +45,6 @@ if(isset($_POST['submit']))
 	} else {
 		WriteSettingToFile("LAST_READ",urlencode($_POST["LAST_READ"]),$pluginName);
 	}
-
 }
 
 	
@@ -53,7 +64,7 @@ if(isset($_POST['submit']))
 	if($SEPARATOR == "") {
 		$SEPARATOR="|";
 	}
-	//echo "sports read: ".$SPORTS."<br/> \n";
+	
 	
 	if((int)$LAST_READ == 0 || $LAST_READ == "") {
 		$LAST_READ=0;
@@ -158,6 +169,13 @@ if($DEBUG) {
 ?>
 <p/>
 <input id="submit_button" name="submit" type="submit" class="buttons" value="Save Config">
+<?
+ if(file_exists($pluginUpdateFile))
+ {
+ 	//echo "updating plugin included";
+	include $pluginUpdateFile;
+}
+?>
 
 </form>
 
